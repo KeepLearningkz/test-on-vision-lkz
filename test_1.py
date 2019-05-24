@@ -117,7 +117,7 @@ sample4=sample4.loc[0:6]
 sample5=sample5.loc[0:11]
 acc=pd.DataFrame()
 
-def checking_smaple(sample,num): 
+def checking_sample(sample,num): 
     acc = pd.DataFrame（）
     for i in range(len(sample)):
         print(i)
