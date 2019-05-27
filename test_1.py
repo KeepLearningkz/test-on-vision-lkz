@@ -110,31 +110,36 @@ sample2=pd.read_excel("VISION_API_G2.xlsx")
 sample3=pd.read_excel("VISION_API_G3.xlsx")
 sample4=pd.read_excel("VISION_API_G4.xlsx")
 sample5=pd.read_excel("VISION_API_G5.xlsx")
-sample1=sample1.loc[0:25]
-sample2=sample2.loc[0:28]
-sample3=sample3.loc[0:30]
-sample4=sample4.loc[0:6]
-sample5=sample5.loc[0:11]
+
 acc=pd.DataFrame()
 
-def checking_sample(sample,num): 
-    acc = pd.DataFrame（）
-    for i in range(len(sample)):
+def checking_sample(sample,file_id,start,end): 
+    sample=sample.loc[start:end]
+    acc = pd.DataFrame()
+    error = pd.DataFrame()
+    for i in range(start,end):
         print(i)
-        name_list,percentage_list=run_quickstart(sample1.loc[i,'URL'])
+        name_list,percentage_list=run_quickstart(sample.loc[i,'URL'])
         df_name=pd.DataFrame(name_list)
         df_percentage=pd.DataFrame(percentage_list)
         df=pd.concat([df_name,df_percentage],axis=1)
-        df['URL']=sample1.loc[i,'URL']
-        acc=pd.concat([acc,df], axis= 0, sort=False)
+        df['URL']=sample.loc[i,'URL']
+        if len(df)>0:            
+            acc=pd.concat([acc,df], axis= 0, sort=False)
+        else:
+            print("error!!!")
+            df2=sample1.loc[i]
+            error=pd.concat([error,df2], axis= 0, sort=False)
     print(acc)
+    print(error)
     total=pd.merge(left=sample,right=acc,on="URL", how='outer')
-    total.to_csv("sample"+str(num)+".csv")
+    total.to_csv("sample"+file_id+".csv")
+    error.to_csv("error.csv")
     
-checking_sample(sample1,1)
-checking_sample(sample2,2)
-checking_sample(sample3,3)
-checking_sample(sample4,4)
-checking_sample(sample5,5)
+checking_sample(sample1,"1_2000",1000,2000)
+checking_sample(sample2,"2_2000",1000,2000)
+checking_sample(sample3,"3_2000",1000,2000)
+checking_sample(sample4,"4_2000",1000,2000)
+checking_sample(sample5,"5_2000",1000,2000)
     
 
