@@ -126,10 +126,10 @@ def checking_sample(sample,num):
         df_percentage=pd.DataFrame(percentage_list)
         df=pd.concat([df_name,df_percentage],axis=1)
         df['URL']=sample1.loc[i,'URL']
-        total=pd.merge(left=sample1,right=df,on="URL", how='outer')
-        acc=pd.concat([acc,total],axis=0)
+        acc=pd.concat([acc,df], axis= 0, sort=False)
     print(acc)
-    acc.to_csv("sample"+str(num)+".csv")
+    total=pd.merge(left=sample,right=acc,on="URL", how='outer')
+    total.to_csv("sample"+str(num)+".csv")
     
 checking_sample(sample1,1)
 checking_sample(sample2,2)
