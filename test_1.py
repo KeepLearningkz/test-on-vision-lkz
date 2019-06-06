@@ -55,10 +55,11 @@ def detect_text_uri(uri):
         vertices = (['({},{})'.format(vertex.x, vertex.y)
                     for vertex in text.bounding_poly.vertices])
 
-        text2='bounds: {}'.format(','.join(vertices))
+        text2='\n"{}"'.format(text.description)
+        print('bounds: {}'.format(','.join(vertices)))
         print(text2)
         text_list.append(text2)
-        return text_list
+    return text_list
 
 sample1=pd.read_excel("VISION_API_G1.xlsx")
 sample2=pd.read_excel("VISION_API_G2.xlsx")
@@ -71,6 +72,7 @@ acc=pd.DataFrame()
 def checking_sample(sample,file_id,start,end): 
     sample=sample.loc[start:end]
     acc = pd.DataFrame()
+    acc_text=pd.DataFrame()
     error = pd.DataFrame()
     for i in range(start,end):
         print(i)
@@ -81,6 +83,7 @@ def checking_sample(sample,file_id,start,end):
         df['URL']=sample.loc[i,'URL']
         text_list= detect_text_uri(sample.loc[i,'URL'])
         df_text=pd.DataFrame(text_list)
+        acc_text=pd.concat([acc_text,df_text], axis= 0, sort=False)
         if len(df)>0:            
             acc=pd.concat([acc,df], axis= 0, sort=False)
         else:
@@ -92,8 +95,10 @@ def checking_sample(sample,file_id,start,end):
     total=pd.merge(left=sample,right=acc,on="URL", how='outer')
     total.to_csv("sample"+file_id+".csv")
     error.to_csv("error.csv")
-    df_text.to_csv("text.csv")
-    
+    acc_text.to_csv("text.csv")
+    print(text_list)
+    print(acc_text)    
+
 checking_sample(sample1,"1_2000",10,20)
 #checking_sample(sample2,"2_2000",1000,2000)
 #checking_sample(sample3,"3_2000",1000,2000)
