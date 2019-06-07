@@ -48,7 +48,9 @@ def detect_text_uri(uri):
     texts = response.text_annotations
     print('Texts:')
     text_list=list()
-
+    mark_list=list()   
+    sentence=""
+    count=0
     for text in texts:
         print('\n"{}"'.format(text.description))
 
@@ -59,7 +61,15 @@ def detect_text_uri(uri):
         print('bounds: {}'.format(','.join(vertices)))
         print(text2)
         text_list.append(text2)
-    return text_list
+        if count==0:
+            mark_list.append(1)
+        else:
+            mark_list.append(0)
+        count+=1
+        #sentence+=text2
+    #text_list.append(sentence)
+    #mark_list.append(1)
+    return text_list, mark_list
 
 sample1=pd.read_excel("VISION_API_G1.xlsx")
 sample2=pd.read_excel("VISION_API_G2.xlsx")
@@ -81,21 +91,33 @@ def checking_sample(sample,file_id,start,end):
         df_percentage=pd.DataFrame(percentage_list)
         df=pd.concat([df_name,df_percentage],axis=1)
         df['URL']=sample.loc[i,'URL']
-        text_list= detect_text_uri(sample.loc[i,'URL'])
+        
+        text_list,mark_list= detect_text_uri(sample.loc[i,'URL'])
         df_text=pd.DataFrame(text_list)
-        acc_text=pd.concat([acc_text,df_text], axis= 0, sort=False)
+        df_mark=pd.DataFrame(mark_list)
+        df2=pd.concat([df_text,df_mark],axis=1)
+        df2['URL']=sample.loc[i,'URL']
+
         if len(df)>0:            
             acc=pd.concat([acc,df], axis= 0, sort=False)
         else:
             print("error!!!")
             df2=sample1.loc[i]
             error=pd.concat([error,df2], axis= 0, sort=False)
+        
+        if len(df2)>0:            
+            acc_text=pd.concat([acc_text,df2], axis= 0, sort=False)
+        else:
+            print("error!!!")
     print(acc)
     print(error)
     total=pd.merge(left=sample,right=acc,on="URL", how='outer')
     total.to_csv("sample"+file_id+".csv")
+    total_text=pd.merge(left=sample,right=acc_text,on="URL", how='outer')
+    total_text["mark"]=0 
+    total_text.to_csv("sample"+file_id+"_text.csv")
     error.to_csv("error.csv")
-    acc_text.to_csv("text.csv")
+    #acc_text.to_csv("text.csv")
     print(text_list)
     print(acc_text)    
 
